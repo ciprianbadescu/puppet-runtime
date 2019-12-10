@@ -23,6 +23,8 @@ project 'agent-runtime-5.5.x' do |proj|
   # Directory for gems shared by puppet and puppetserver
   proj.setting(:puppet_gem_vendor_dir, File.join(proj.libdir, "ruby", "vendor_gems"))
 
+  proj.setting(:boost_link_option, "")
+
   ########
   # Load shared agent components
   ########
