@@ -1,0 +1,40 @@
+--- a/crypto/rand/rand_lib.c	2019-09-10 13:24:10.000000000 +0000
++++ b/crypto/rand/rand_lib.c	2020-01-15 11:26:14.429981300 +0000
+@@ -296,7 +296,15 @@
+         RANDerr(RAND_F_RAND_INIT_FIPS, RAND_R_ERROR_INITIALISING_DRBG);
+         return 0;
+     }
+-
++
++    if (getenv("OPENSSL_SHOW_DRBG_TYPE")) {
++      struct d {
++        int type;
++      };
++      struct d* pd=dctx;
++      fprintf(stderr, "initialized drbg type: %d\n", pd->type);
++    }
++    
+     FIPS_drbg_set_callbacks(dctx,
+                             drbg_get_entropy, drbg_free_entropy, 20,
+                             drbg_get_nonce, drbg_free_entropy);
+--- a/crypto/crypto.h	2020-01-16 09:50:22.018086800 +0000
++++ b/crypto/crypto.h	2020-01-16 09:54:12.889356000 +0000
+@@ -605,6 +605,10 @@
+         int alg##_Init(cx##_CTX *c)
+ 
+ # ifdef OPENSSL_FIPS
++typedef struct drbg_ctx_st DRBG_CTX;
++DRBG_CTX *FIPS_get_default_drbg(void);
++int FIPS_drbg_init(DRBG_CTX *dctx, int type, unsigned int flags);
++
+ #  define nonfips_md_init_ctx(alg, cx) \
+         int alg##_Init(cx##_CTX *c) \
+         { \
+--- a/util/libeay.num	2019-12-20 13:09:07.000000000 +0000
++++ b/util/libeay.num	2020-01-16 12:11:11.481374300 +0000
+@@ -4433,3 +4433,5 @@
+ EVP_PKEY_meth_get_copy                  4788	EXIST::FUNCTION:
+ ossl_safe_getenv                        4789	EXIST::FUNCTION:
+ OPENSSL_rdtsc                           4790	EXIST::FUNCTION:
++FIPS_drbg_init                          4791	EXIST::FUNCTION:
++FIPS_get_default_drbg                   4792	EXIST::FUNCTION:
